@@ -329,39 +329,52 @@ QWidget* MainWindow::createMapPage()
 QWidget* MainWindow::createProfilePage()
 {
     auto *page = new QWidget(this);
-    auto *layout = new QVBoxLayout(page);
-    layout->setContentsMargins(16, 16, 16, 16);
-    layout->setSpacing(12);
+    auto *top = new QVBoxLayout(page);
+    top->setContentsMargins(16, 16, 16, 16);
+    top->setSpacing(12);
 
-    m_profileTitle = new QLabel(tr("个人信息"), page);
+    // 内容区居中
+    auto *center = new QWidget(page);
+    auto *vbox = new QVBoxLayout(center);
+    vbox->setAlignment(Qt::AlignCenter); // 整体垂直水平居中
+    vbox->setSpacing(12);
+    m_profileTitle = new QLabel(tr("个人信息"), center);
     m_profileTitle->setStyleSheet("font-size:22px; font-weight:700;");
-    m_profileName = new QLabel(page);
-    m_profileId = new QLabel(page);
-    m_profileBalance = new QLabel(page);
+    m_profileName = new QLabel(center);
+    m_profileId = new QLabel(center);
+    m_profileBalance = new QLabel(center);
     m_profileName->setStyleSheet("font-size:18px;");
     m_profileId->setStyleSheet("font-size:16px; color:#444;");
     m_profileBalance->setStyleSheet("font-size:18px; font-weight:600;");
+    vbox->addWidget(m_profileTitle, 0, Qt::AlignHCenter);
+    vbox->addWidget(m_profileName, 0, Qt::AlignHCenter);
+    vbox->addWidget(m_profileId, 0, Qt::AlignHCenter);
+    vbox->addWidget(m_profileBalance, 0, Qt::AlignHCenter);
+    vbox->addSpacing(12);
+    center->setLayout(vbox);
+    // 将内容区整体加到顶层layout并占据较多空间以实现视觉居中
+    top->addStretch(2);
+    top->addWidget(center, 0, Qt::AlignCenter);
+    top->addStretch(3);
 
+    // 底部刷新和返回按钮
+    auto *bottom = new QHBoxLayout();
+    bottom->setContentsMargins(0,0,0,0);
+    bottom->setSpacing(0);
     auto *btnRefresh = new QPushButton(tr("刷新余额"), page);
     btnRefresh->setFixedWidth(140);
     connect(btnRefresh, &QPushButton::clicked, this, [this] {
         updateProfileMock();
     });
-
     auto *btnBack = new QPushButton(tr("返回"), page);
     btnBack->setFixedWidth(120);
     connect(btnBack, &QPushButton::clicked, this, [this] {
         switchPage(Page::Dashboard);
     });
-
-    layout->addWidget(m_profileTitle, 0, Qt::AlignLeft);
-    layout->addWidget(m_profileName, 0, Qt::AlignLeft);
-    layout->addWidget(m_profileId, 0, Qt::AlignLeft);
-    layout->addWidget(m_profileBalance, 0, Qt::AlignLeft);
-    layout->addSpacing(12);
-    layout->addWidget(btnRefresh, 0, Qt::AlignLeft);
-    layout->addStretch();
-    layout->addWidget(btnBack, 0, Qt::AlignRight);
+    bottom->addWidget(btnRefresh,0,Qt::AlignLeft);
+    bottom->addStretch();
+    bottom->addWidget(btnBack,0,Qt::AlignRight);
+    top->addLayout(bottom);
     return page;
 }
 
